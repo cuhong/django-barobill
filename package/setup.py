@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
-
+long_description=open("README.md").read()
 setup(
     name="django-barobill",  # 패키지 이름 (PyPI에 등록될 이름)
-    version="0.1.0",  # 초기 버전
+    version="0.1.1",  # 초기 버전
     packages=find_packages(exclude=["tests*", "docs*"]),  # 'django_barobill' 폴더 포함
     include_package_data=True,  # MANIFEST.in 파일에 포함된 파일도 추가
     license="MIT License",  # 라이선스
