@@ -53,7 +53,20 @@ class BankHelper:
             web_pwd: Optional[str] = None,
             identity_num: Optional[str] = None
     ):
-        # need test
+        """
+        신규 계좌를 등록한다.
+        :param alias: 별칭
+        :param collect_cycle: 수거주기
+        :param bank: 은행
+        :param account_type: 법인/개인계좌 여부
+        :param account_no: 계좌번호
+        :param password: 계좌 비밀번호
+        :param usage: (선택)적요
+        :param web_id:  (선택)간편조회 아이디
+        :param web_pwd: (선택)간편조회 비밀번호
+        :param identity_num: (선택)간편조회 사업자등록번호 혹은 생년월일
+        :return: 생성된 BankAccount 인스턴스
+        """
         result = self.client.service.RegisterBankAccount(
             CERTKEY=self.partner.api_key,
             CorpNum=self.partner.brn,
@@ -88,11 +101,32 @@ class BankHelper:
         ).update(is_stop=True, stop_date=timezone.localdate())
 
 
+class PartnerManager(models.Manager):
+    def register_partner(self, name, brn, api_key, userid, dev=False):
+        """
+        신규 파트너를 등록한다.
+        :param name: 파트너사명
+        :param brn: 바로빌에 등록한 파트너 사업자등록번호
+        :param api_key: 바로빌에서 발급한 파트너 api_key
+        :param userid: 바로빌에서 발급한 파트너 Id
+        :param dev: 개발모드 여부
+        :return: Partner
+        """
+        partner, created = self.get_or_create(
+            brn=brn, userid=userid, defaults=dict(name=name, api_key=api_key, dev=dev)
+        )
+        return partner
+
+
 class Partner(models.Model):
     class Meta:
         verbose_name = '파트너'
         verbose_name_plural = verbose_name
+        constraints = [
+            models.UniqueConstraint(fields=['brn', 'userid', 'dev'], name='unique_partner_brn_userid'),
+        ]
 
+    objects = PartnerManager()
     name = models.CharField(max_length=255, unique=True, verbose_name='파트너사명')
     brn = models.CharField(max_length=10, unique=True, verbose_name='사업자등록번호')
     api_key = models.CharField(max_length=36, verbose_name='인증키')
@@ -328,7 +362,6 @@ class BankAccount(models.Model):
         if result.CurrentPage <= 0:
             raise BarobillAPIError(result.CurrentPage)
         return result
-
 
     def get_monthly_log(
             self,
