@@ -67,7 +67,7 @@ class BankHelper:
         :param identity_num: (선택)간편조회 사업자등록번호 혹은 생년월일
         :return: 생성된 BankAccount 인스턴스
         """
-        result = self.client.service.RegisterBankAccount(
+        result = self.client.service.RegistBankAccount(
             CERTKEY=self.partner.api_key,
             CorpNum=self.partner.brn,
             CollectCycle=collect_cycle,
@@ -85,7 +85,7 @@ class BankHelper:
             raise BarobillAPIError(result)
         account, created = BankAccount.objects.update_or_create(
             partner=self.partner, account_no=account_no, defaults=dict(
-                collect_cycle=collect_cycle, bank=bank, account_type=account_type, alias=alias, usage=usage, is_delete=False
+                collect_cycle=collect_cycle, bank=bank, account_type=account_type, alias=alias, usage=usage, is_stop=False
             )
         )
         return account
