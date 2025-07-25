@@ -3,7 +3,7 @@ from typing import Optional
 
 from django.db import models
 from django.utils import timezone
-from zeep import Client
+from zeep import Client, Transport
 
 from django_barobill.choices import BankAccountCollectCycle, BankAccountBank, BankAccountAccountType, BankAccountTransactionDirection
 from django_barobill.errors import BarobillAPIError, BarobillError
@@ -20,7 +20,8 @@ class BankHelper:
             endpoint = "https://testws.baroservice.com/BANKACCOUNT.asmx?wsdl"
         else:
             endpoint = "https://ws.baroservice.com/BANKACCOUNT.asmx?wsdl"
-        return Client(endpoint)
+        transport = Transport(timeout=180)
+        return Client(endpoint, transport=transport)
 
     def get_bank_account_management_url(self):
         return self.client.service.GetBankAccountManagementURL(
