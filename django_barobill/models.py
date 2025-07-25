@@ -20,7 +20,7 @@ class BankHelper:
             endpoint = "https://testws.baroservice.com/BANKACCOUNT.asmx?wsdl"
         else:
             endpoint = "https://ws.baroservice.com/BANKACCOUNT.asmx?wsdl"
-        transport = Transport(timeout=180)
+        transport = Transport(timeout=60)
         return Client(endpoint, transport=transport)
 
     def get_bank_account_management_url(self):
